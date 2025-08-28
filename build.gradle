@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    mainClass = 'org.tslearn.clustering.PythonEquivalentExample'
+}
+
+group = 'org.htc'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Apache Commons Math for statistical functions and linear algebra
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    
+    // SLF4J for logging
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.slf4j:slf4j-simple:1.7.36'
+    
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.+'
+}
+
+test {
+    useJUnitPlatform()
+}
