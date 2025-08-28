@@ -1,13 +1,15 @@
 # TSLearn4J - Java Implementation of Time Series Machine Learning
 
-Uma implementação Java otimizada de algoritmos de machine learning para séries temporais, começando com o algoritmo **KShape**.
+Uma implementação Java otimizada de algoritmos de machine learning para séries temporais, incluindo **KShape clustering** e **Dynamic Time Warping (DTW)**.
 
 ## Características
 
 - 🚀 **Performance otimizada**: Implementação pura Java usando Apache Commons Math
 - 📊 **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
+- � **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
+- 🧮 **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
+- ⚡ **FFT Optimization**: Transformada rápida de Fourier para cross-correlation
 - 🔬 **Compatível com Python tslearn**: API similar ao tslearn Python
-- ⚡ **Sem dependências pesadas**: Usa apenas Apache Commons Math
 - 🧪 **Bem testado**: Testes unitários abrangentes
 
 ## Instalação
@@ -16,6 +18,7 @@ Uma implementação Java otimizada de algoritmos de machine learning para série
 ```gradle
 dependencies {
     implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.github.wendykierp:JTransforms:3.1'
     implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'org.slf4j:slf4j-simple:1.7.36'
 }
@@ -95,9 +98,74 @@ public class ExemploKShape {
 }
 ```
 
-## Algoritmo KShape
+### Dynamic Time Warping (DTW)
+
+```java
+import org.tslearn.metrics.DTW;
+import org.tslearn.metrics.DTWNeighbors;
+
+// Séries temporais
+double[] ts1 = {1.0, 2.0, 3.0, 4.0, 3.0, 2.0, 1.0};
+double[] ts2 = {0.5, 1.5, 2.5, 3.5, 2.5, 1.5, 0.5};
+
+// DTW básica
+DTW dtw = new DTW();
+double distance = dtw.distance(ts1, ts2);
+
+// DTW com restrição Sakoe-Chiba (band width = 3)
+DTW constrainedDTW = new DTW(3);
+double constrainedDistance = constrainedDTW.distance(ts1, ts2);
+
+// DTW com path alignment
+DTW.DTWResult result = dtw.distanceWithPath(ts1, ts2);
+System.out.println("Distance: " + result.getDistance());
+System.out.println("Path length: " + result.getPathLength());
+
+// Busca k-NN com DTW otimizada
+double[][] dataset = { /* múltiplas séries temporais */ };
+double[] query = {1.0, 2.0, 3.0, 2.0, 1.0};
+
+DTWNeighbors neighbors = new DTWNeighbors(constrainedDTW, true, 4, true);
+List<DTWNeighbors.NeighborResult> results = neighbors.kNearest(query, dataset, 5);
+
+for (DTWNeighbors.NeighborResult neighbor : results) {
+    System.out.println("Index: " + neighbor.getIndex() + 
+                      ", Distance: " + neighbor.getDistance());
+}
+```
+
+## Algoritmos Implementados
+
+### KShape Clustering
 
 O KShape é um algoritmo de clustering para séries temporais que:
+
+- 🔍 **Shape-based**: Agrupa séries por forma, não por valores absolutos
+- ⚡ **FFT Otimizado**: Usa transformada rápida de Fourier para cross-correlation
+- 🎯 **Robusto**: Tratamento de eigendecomposition failures com fallback
+- 📈 **Escalável**: Otimizações adaptativas baseadas no tamanho das séries
+
+### Dynamic Time Warping (DTW)
+
+Implementação otimizada de DTW com múltiplas estratégias de aceleração:
+
+#### Estratégias de Otimização
+
+- **Restrições Globais**:
+  - Sakoe-Chiba band: Limita warping a uma banda diagonal
+  - Itakura parallelogram: Restrição mais conservadora
+  
+- **Lower Bounds para Pruning**:
+  - LB_Yi: Lower bound baseado em primeiro/último elementos
+  - LB_Keogh: Lower bound com envelope baseado em banda
+  - LB_PAA: Lower bound usando Piecewise Aggregate Approximation
+  - LB_Improved: Combinação de múltiplos lower bounds
+
+- **Otimizações de Performance**:
+  - Memory-efficient: Usa apenas 2 linhas ao invés de matriz completa
+  - Early termination: Para quando threshold é excedido
+  - Parallel processing: Busca k-NN paralela para datasets grandes
+  - Lower bound cascade: Pruning em múltiplos níveis
 
 1. **Usa correlação cruzada normalizada** como medida de similaridade
 2. **É invariante a deslocamento temporal** (time shift invariant)
@@ -196,9 +264,9 @@ Se usar este projeto em pesquisa acadêmica, por favor cite:
 ```bibtex
 @software{tslearn4j,
   title={TSLearn4J: Java Implementation of Time Series Machine Learning},
-  author={Your Name},
+  author={Francisco Wallison Rocha},
   year={2025},
-  url={https://github.com/username/tslearn4j}
+  url={https://github.com/fwrock/tslearn4j}
 }
 ```
 
