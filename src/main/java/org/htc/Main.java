@@ -1,7 +1,9 @@
 package org.htc;
 
+import org.tslearn.examples.ComparisonWithPythonExample;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        ComparisonWithPythonExample.main(args);
     }
 }

@@ -122,7 +122,15 @@ public class KShape {
         RealMatrix M = Q.transpose().multiply(S).multiply(Q);
         
         // Find principal eigenvector using Apache Commons Math
-        EigenDecomposition eigenDecomp = new EigenDecomposition(M);
+        EigenDecomposition eigenDecomp;
+        try {
+            eigenDecomp = new EigenDecomposition(M);
+        } catch (Exception e) {
+            // If eigendecomposition fails, fall back to simple centroid
+            logger.warn("Eigendecomposition failed, using simple centroid: " + e.getMessage());
+            RealMatrix simpleCentroid = computeSimpleCentroid(clusterData);
+            return simpleCentroid;
+        }
         
         // Get eigenvector corresponding to largest eigenvalue
         int maxEigenIdx = 0;
@@ -155,6 +163,33 @@ public class KShape {
         }
         
         return muK;
+    }
+    
+    /**
+     * Compute simple centroid (mean) as fallback when eigendecomposition fails
+     */
+    private RealMatrix computeSimpleCentroid(RealMatrix[] clusterData) {
+        if (clusterData.length == 0) {
+            throw new EmptyClusterException("Cannot compute centroid for empty cluster");
+        }
+        
+        int sz = clusterData[0].getRowDimension();
+        int d = clusterData[0].getColumnDimension();
+        
+        RealMatrix centroid = new Array2DRowRealMatrix(sz, d);
+        
+        // Compute mean across all series in cluster
+        for (int i = 0; i < sz; i++) {
+            for (int j = 0; j < d; j++) {
+                double sum = 0.0;
+                for (RealMatrix ts : clusterData) {
+                    sum += ts.getEntry(i, j);
+                }
+                centroid.setEntry(i, j, sum / clusterData.length);
+            }
+        }
+        
+        return centroid;
     }
     
     /**

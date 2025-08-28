@@ -59,6 +59,7 @@ public class CrossCorrelation {
     
     /**
      * Compute normalized cross-correlation between two time series
+     * Uses FFT optimization for longer series, naive approach for shorter ones
      */
     public static double normalizedCrossCorrelation(double[] ts1, double[] ts2, 
                                                    double norm1, double norm2) {
@@ -67,24 +68,31 @@ public class CrossCorrelation {
         }
         
         int sz = ts1.length;
-        double maxCorr = 0.0;
         
-        // Compute cross-correlation for all possible shifts
-        for (int shift = -(sz-1); shift < sz; shift++) {
-            double corr = 0.0;
+        // Use FFT for longer series, naive approach for shorter ones
+        if (FastCrossCorrelation.shouldUseFFT(sz)) {
+            return FastCrossCorrelation.normalizedCrossCorrelationMax(ts1, ts2, norm1, norm2);
+        } else {
+            // Original naive approach for short series
+            double maxCorr = 0.0;
             
-            for (int i = 0; i < sz; i++) {
-                int j = i + shift;
-                if (j >= 0 && j < sz) {
-                    corr += ts1[i] * ts2[j];
+            // Compute cross-correlation for all possible shifts
+            for (int shift = -(sz-1); shift < sz; shift++) {
+                double corr = 0.0;
+                
+                for (int i = 0; i < sz; i++) {
+                    int j = i + shift;
+                    if (j >= 0 && j < sz) {
+                        corr += ts1[i] * ts2[j];
+                    }
                 }
+                
+                double normalizedCorr = corr / (norm1 * norm2);
+                maxCorr = Math.max(maxCorr, normalizedCorr);
             }
             
-            double normalizedCorr = corr / (norm1 * norm2);
-            maxCorr = Math.max(maxCorr, normalizedCorr);
+            return maxCorr;
         }
-        
-        return maxCorr;
     }
     
     /**
@@ -125,6 +133,7 @@ public class CrossCorrelation {
     
     /**
      * Find the best shift that maximizes normalized cross-correlation
+     * Uses FFT optimization when appropriate
      */
     private static int findBestShift(double[] centroid, double[] ts, 
                                     double normCentroid, double normTs) {
@@ -133,27 +142,34 @@ public class CrossCorrelation {
         }
         
         int sz = centroid.length;
-        double maxCorr = Double.NEGATIVE_INFINITY;
-        int bestShift = 0;
         
-        for (int shift = -(sz-1); shift < sz; shift++) {
-            double corr = 0.0;
+        // Use FFT for longer series
+        if (FastCrossCorrelation.shouldUseFFT(sz)) {
+            return FastCrossCorrelation.findBestShiftFFT(centroid, ts, normCentroid, normTs);
+        } else {
+            // Original naive approach for short series
+            double maxCorr = Double.NEGATIVE_INFINITY;
+            int bestShift = 0;
             
-            for (int i = 0; i < sz; i++) {
-                int j = i + shift;
-                if (j >= 0 && j < sz) {
-                    corr += centroid[i] * ts[j];
+            for (int shift = -(sz-1); shift < sz; shift++) {
+                double corr = 0.0;
+                
+                for (int i = 0; i < sz; i++) {
+                    int j = i + shift;
+                    if (j >= 0 && j < sz) {
+                        corr += centroid[i] * ts[j];
+                    }
+                }
+                
+                double normalizedCorr = corr / (normCentroid * normTs);
+                if (normalizedCorr > maxCorr) {
+                    maxCorr = normalizedCorr;
+                    bestShift = shift;
                 }
             }
             
-            double normalizedCorr = corr / (normCentroid * normTs);
-            if (normalizedCorr > maxCorr) {
-                maxCorr = normalizedCorr;
-                bestShift = shift;
-            }
+            return bestShift;
         }
-        
-        return bestShift;
     }
     
     /**

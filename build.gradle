@@ -4,7 +4,7 @@ plugins {
 }
 
 application {
-    mainClass = 'org.tslearn.clustering.PythonEquivalentExample'
+    mainClass = 'org.htc.Main'
 }
 
 group = 'org.htc'
@@ -17,6 +17,9 @@ repositories {
 dependencies {
     // Apache Commons Math for statistical functions and linear algebra
     implementation 'org.apache.commons:commons-math3:3.6.1'
+    
+    // JTransforms for FFT operations
+    implementation 'com.github.wendykierp:JTransforms:3.1'
     
     // SLF4J for logging
     implementation 'org.slf4j:slf4j-api:1.7.36'
