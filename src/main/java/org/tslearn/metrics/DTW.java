@@ -441,4 +441,193 @@ public class DTW {
             return String.format("DTWResult{distance=%.6f, pathLength=%d}", distance, path.length);
         }
     }
+    
+    /**
+     * Calcula a distância DTW entre duas séries temporais multivariadas.
+     * 
+     * @param ts1 Primeira série temporal [time_length][n_features]
+     * @param ts2 Segunda série temporal [time_length][n_features]
+     * @return Distância DTW
+     */
+    public double distance(double[][] ts1, double[][] ts2) {
+        if (ts1 == null || ts2 == null) {
+            throw new IllegalArgumentException("Séries temporais não podem ser nulas");
+        }
+        
+        if (ts1[0].length != ts2[0].length) {
+            throw new IllegalArgumentException("Séries devem ter o mesmo número de features");
+        }
+        
+        int n = ts1.length;
+        int m = ts2.length;
+        int nFeatures = ts1[0].length;
+        
+        // Matriz de custos DTW
+        double[][] cost = new double[n + 1][m + 1];
+        
+        // Inicialização
+        for (int i = 0; i <= n; i++) {
+            cost[i][0] = Double.POSITIVE_INFINITY;
+        }
+        for (int j = 0; j <= m; j++) {
+            cost[0][j] = Double.POSITIVE_INFINITY;
+        }
+        cost[0][0] = 0.0;
+        
+        // Preenchimento da matriz
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (isValidCell(i - 1, j - 1, n, m)) {
+                    double euclideanDist = euclideanDistance(ts1[i - 1], ts2[j - 1]);
+                    cost[i][j] = euclideanDist + Math.min(Math.min(
+                        cost[i - 1][j],     // Inserção
+                        cost[i][j - 1]),    // Deleção
+                        cost[i - 1][j - 1]  // Match
+                    );
+                } else {
+                    cost[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+        
+        return cost[n][m];
+    }
+    
+    /**
+     * Calcula a distância DTW com o caminho de alinhamento para séries multivariadas.
+     */
+    public DTWPathResult distanceWithPath(double[][] ts1, double[][] ts2) {
+        if (ts1 == null || ts2 == null) {
+            throw new IllegalArgumentException("Séries temporais não podem ser nulas");
+        }
+        
+        int n = ts1.length;
+        int m = ts2.length;
+        
+        // Matriz de custos DTW
+        double[][] cost = new double[n + 1][m + 1];
+        
+        // Inicialização
+        for (int i = 0; i <= n; i++) {
+            cost[i][0] = Double.POSITIVE_INFINITY;
+        }
+        for (int j = 0; j <= m; j++) {
+            cost[0][j] = Double.POSITIVE_INFINITY;
+        }
+        cost[0][0] = 0.0;
+        
+        // Preenchimento da matriz
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (isValidCell(i - 1, j - 1, n, m)) {
+                    double euclideanDist = euclideanDistance(ts1[i - 1], ts2[j - 1]);
+                    cost[i][j] = euclideanDist + Math.min(Math.min(
+                        cost[i - 1][j],     // Inserção
+                        cost[i][j - 1]),    // Deleção
+                        cost[i - 1][j - 1]  // Match
+                    );
+                } else {
+                    cost[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+        
+        // Reconstruir caminho
+        java.util.List<int[]> path = new java.util.ArrayList<>();
+        int i = n, j = m;
+        
+        while (i > 0 && j > 0) {
+            path.add(new int[]{i - 1, j - 1});
+            
+            double diag = cost[i - 1][j - 1];
+            double left = cost[i][j - 1];
+            double up = cost[i - 1][j];
+            
+            if (diag <= left && diag <= up) {
+                i--; j--;
+            } else if (left <= up) {
+                j--;
+            } else {
+                i--;
+            }
+        }
+        
+        // Reverter o caminho
+        java.util.Collections.reverse(path);
+        
+        return new DTWPathResult(cost[n][m], path);
+    }
+    
+    /**
+     * Calcula a distância euclidiana entre dois pontos multivariados.
+     */
+    private double euclideanDistance(double[] point1, double[] point2) {
+        double sum = 0.0;
+        for (int d = 0; d < point1.length; d++) {
+            double diff = point1[d] - point2[d];
+            sum += diff * diff;
+        }
+        return Math.sqrt(sum);
+    }
+    
+    /**
+     * Resultado DTW com caminho para séries multivariadas.
+     */
+    public static class DTWPathResult {
+        private final double distance;
+        private final java.util.List<int[]> path;
+        
+        public DTWPathResult(double distance, java.util.List<int[]> path) {
+            this.distance = distance;
+            this.path = path;
+        }
+        
+        public double getDistance() {
+            return distance;
+        }
+        
+        public java.util.List<int[]> getPath() {
+            return path;
+        }
+        
+        public String toString() {
+            return String.format("DTWPathResult{distance=%.6f, pathLength=%d}", distance, path.size());
+        }
+    }
+    
+    /**
+     * Builder pattern para construção da DTW.
+     */
+    public static class Builder {
+        private GlobalConstraint constraint = GlobalConstraint.NONE;
+        private double constraintParam = 0.0;
+        private boolean earlyTermination = false;
+        private double earlyThreshold = Double.POSITIVE_INFINITY;
+        
+        public Builder constraintType(GlobalConstraint constraint) {
+            this.constraint = constraint;
+            return this;
+        }
+        
+        public Builder sakoeChibaRadius(int radius) {
+            this.constraint = GlobalConstraint.SAKOE_CHIBA;
+            this.constraintParam = radius;
+            return this;
+        }
+        
+        public Builder itakuraParallelogram() {
+            this.constraint = GlobalConstraint.ITAKURA;
+            return this;
+        }
+        
+        public Builder enableEarlyTermination(double threshold) {
+            this.earlyTermination = true;
+            this.earlyThreshold = threshold;
+            return this;
+        }
+        
+        public DTW build() {
+            return new DTW(constraint, constraintParam, earlyTermination, earlyThreshold);
+        }
+    }
 }

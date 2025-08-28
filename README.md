@@ -1,4 +1,15 @@
-# TSLearn4J - Java Implementation of Time Series Machine Learning
+# TS## Características
+
+- 🚀 **Performance otimizada**: Implementação pura Java usando Apache Commons Math
+- 📊 **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
+- 🔴 **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
+- 🟦 **TimeSeriesKMeans**: K-means temporal com métricas Euclidiana e DTW
+- 🧮 **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
+- ⚡ **FFT Optimization**: Transformada rápida de Fourier para cross-correlation
+- 🔬 **Compatível com Python tslearn**: API similar ao tslearn Python
+- 🧪 **Bem testado**: Testes unitários abrangentes
+- 📈 **Séries Multivariadas**: Suporte completo para séries temporais multivariadas
+- 🎯 **DBA**: DTW Barycenter Averaging para centróides ótimos Java Implementation of Time Series Machine Learning
 
 Uma implementação Java otimizada de algoritmos de machine learning para séries temporais, incluindo **KShape clustering** e **Dynamic Time Warping (DTW)**.
 
@@ -48,6 +59,77 @@ double[][] data = {
 };
 
 // Criar e treinar modelo KShape
+KShape kshape = new KShape.Builder()
+    .nClusters(2)
+    .maxIter(100)
+    .verbose(true)
+    .build();
+
+kshape.fit(data);
+int[] labels = kshape.getLabels();
+double[][] centroids = kshape.getClusterCenters();
+```
+
+### TimeSeriesKMeans - K-means Temporal
+
+```java
+import org.tslearn.clustering.TimeSeriesKMeans;
+
+// Dados multivariados [n_samples][time_length][n_features]
+double[][][] data = new double[50][30][2]; // 50 séries, 30 timesteps, 2 features
+// ... preencher dados ...
+
+// K-means Euclidiano
+TimeSeriesKMeans euclideanKMeans = new TimeSeriesKMeans.Builder()
+    .nClusters(3)
+    .metric(TimeSeriesKMeans.Metric.EUCLIDEAN)
+    .maxIter(100)
+    .nInit(10)
+    .verbose(true)
+    .randomSeed(42)
+    .build();
+
+euclideanKMeans.fit(data);
+
+// K-means com DTW
+TimeSeriesKMeans dtwKMeans = new TimeSeriesKMeans.Builder()
+    .nClusters(3)
+    .metric(TimeSeriesKMeans.Metric.DTW)
+    .maxIter(50)
+    .maxIterBarycenter(15)
+    .nInit(5)
+    .verbose(true)
+    .randomSeed(42)
+    .build();
+
+dtwKMeans.fit(data);
+
+// Predição em novos dados
+int[] predictions = dtwKMeans.predict(newData);
+double[][] distances = dtwKMeans.transform(newData);
+```
+
+### DTW (Dynamic Time Warping)
+
+```java
+import org.tslearn.metrics.DTW;
+
+// DTW simples
+DTW dtw = new DTW();
+double distance = dtw.distance(series1, series2);
+
+// DTW com restrições Sakoe-Chiba
+DTW constrainedDTW = new DTW.Builder()
+    .sakoeChibaRadius(10)
+    .build();
+
+double constrainedDistance = constrainedDTW.distance(series1, series2);
+
+// DTW com caminho de alinhamento
+DTW.DTWPathResult result = dtw.distanceWithPath(series1, series2);
+double distance = result.getDistance();
+List<int[]> path = result.getPath();
+```
 KShape kshape = new KShape(
     2,      // número de clusters
     100,    // máximo de iterações
@@ -245,7 +327,7 @@ Nossa implementação Java oferece:
 ## Roadmap
 
 - [x] **KShape clustering** - Implementação completa
-- [ ] **DTW (Dynamic Time Warping)** - Métricas e algoritmos
+- [x] **DTW (Dynamic Time Warping)** - Métricas e algoritmos
 - [ ] **K-Means temporal** - Clustering tradicional adaptado
 - [ ] **Shapelets** - Descoberta de padrões discriminativos
 - [ ] **Métricas avançadas** - LCSS, MSM, TWE
