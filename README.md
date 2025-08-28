@@ -263,7 +263,7 @@ double[][] newFeatures = transform.transform(X_test);
 - 📈 **Multivariado**: Suporte completo para séries temporais multivariadas
 
 **Documentação completa**: Ver `SHAPELETS_README.md` para detalhes e exemplos avançados.
-```
+
 
 ## Algoritmos Implementados
 
@@ -275,6 +275,98 @@ O KShape é um algoritmo de clustering para séries temporais que:
 - ⚡ **FFT Otimizado**: Usa transformada rápida de Fourier para cross-correlation
 - 🎯 **Robusto**: Tratamento de eigendecomposition failures com fallback
 - 📈 **Escalável**: Otimizações adaptativas baseadas no tamanho das séries
+
+### Dynamic Time Warping (DTW)
+
+Implementação otimizada de DTW com múltiplas estratégias de aceleração:
+
+#### Estratégias de Otimização
+
+- **Restrições Globais**:
+  - Sakoe-Chiba band: Limita warping a uma banda diagonal
+  - Itakura parallelogram: Restrição mais conservadora
+  
+- **Lower Bounds para Pruning**:
+  - LB_Yi: Lower bound baseado em primeiro/último elementos
+  - LB_Keogh: Lower bound com envelope baseado em banda
+  - LB_PAA: Lower bound usando Piecewise Aggregate Approximation
+  - LB_Improved: Combinação de múltiplos lower bounds
+
+- **Otimizações de Performance**:
+  - Memory-efficient: Usa apenas 2 linhas ao invés de matriz completa
+  - Early termination: Para quando threshold é excedido
+  - Parallel processing: Busca k-NN paralela para datasets grandes
+  - Lower bound cascade: Pruning em múltiplos níveis
+
+### 🚀 Early Classification (NOVO!)
+
+Framework completo para **classificação de séries temporais em tempo real**, permitindo tomar decisões antes de observar toda a sequência.
+
+#### Características Principais
+
+- **🎯 Múltiplas Estratégias**: Confidence threshold, margin-based, probability stabilization, ensemble consensus
+- **🔄 Ensemble Inteligente**: Combina múltiplos classificadores (Shapelet, DTW k-NN, Feature-based)
+- **📊 Trade-off Configurável**: Balanceamento preciso entre accuracy e earliness
+- **⚡ Processamento Otimizado**: Paralelo, cache, early stopping
+- **📈 Avaliação Completa**: Métricas detalhadas e análise passo a passo
+
+```java
+// Configuração básica
+EarlyClassifier classifier = new EarlyClassifier.Builder()
+    .confidenceThreshold(0.8)
+    .minLength(5)
+    .stepSize(2)
+    .verbose(true)
+    .build();
+
+// Treinar e classificar
+classifier.fit(trainingData, trainingLabels);
+EarlyClassifier.EarlyResult result = classifier.predictEarly(timeSeries);
+
+System.out.println("Classe: " + result.getPredictedClass());
+System.out.println("Confiança: " + result.getConfidence());
+System.out.println("Earliness: " + result.getEarliness());
+```
+
+#### Estratégias de Stopping
+
+1. **CONFIDENCE_THRESHOLD**: Para quando confiança excede threshold
+2. **MARGIN_BASED**: Para quando margem entre classes é suficiente  
+3. **PROBABILITY_STABILIZATION**: Para quando probabilidades se estabilizam
+4. **ENSEMBLE_CONSENSUS**: Para quando há consenso entre classificadores
+
+#### Métodos de Agregação
+
+1. **PROBABILITY_AVERAGE**: Média das probabilidades
+2. **MAJORITY_VOTE**: Voto majoritário
+3. **WEIGHTED_CONFIDENCE**: Média ponderada pela confiança
+4. **MAX_CONFIDENCE**: Classificador com maior confiança
+
+#### Classificadores Base
+
+1. **ShapeletClassifier**: Baseado em shapelets discriminativos
+2. **DTWNearestNeighbor**: k-NN com Dynamic Time Warping
+3. **FeatureBasedClassifier**: Features estatísticas avançadas
+
+#### Casos de Uso
+
+- 🏭 **Monitoramento Industrial**: Detecção precoce de anomalias
+- 🏥 **Diagnóstico Médico**: Classificação de sinais ECG em tempo real
+- 📱 **IoT e Sensores**: Reconhecimento de atividades humanas
+- 🔍 **Quality Control**: Detecção de defeitos em linhas de produção
+
+### Roadmap 2024
+
+- [x] **Métricas Básicas** (DTW, LCSS, MSM, TWE)
+- [x] **Early Classification** (Real-time decision making)
+- [ ] **Matrix Profile** (Motifs e discords detection)
+- [ ] **Shapelets** (Pattern discovery e classification)
+- [ ] **Barycenters** (DTW e Soft-DTW averaging)
+- [ ] **Neural Networks** (RNNs e attention mechanisms)
+
+---
+
+## Implementações Detalhadas
 
 ### Dynamic Time Warping (DTW)
 
@@ -378,9 +470,9 @@ Nossa implementação Java oferece:
 - [x] **KShape clustering** - Implementação completa
 - [x] **DTW (Dynamic Time Warping)** - Métricas e algoritmos
 - [x] **K-Means temporal** - Clustering tradicional adaptado
-- [ ] **Shapelets** - Descoberta de padrões discriminativos
-- [ ] **Métricas avançadas** - LCSS, MSM, TWE
-- [ ] **Early classification** - Classificação precoce
+- [x] **Shapelets** - Descoberta de padrões discriminativos
+- [x] **Métricas avançadas** - LCSS, MSM, TWE
+- [x] **Early classification** - Classificação precoce
 - [ ] **Matrix Profile** - Motifs e discords
 - [ ] **Paralelização** - Processamento multi-thread
 
