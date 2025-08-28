@@ -4,12 +4,13 @@
 - 📊 **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
 - 🔴 **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
 - 🟦 **TimeSeriesKMeans**: K-means temporal com métricas Euclidiana e DTW
+- 🎯 **Shapelets**: Descoberta de padrões discriminativos para classificação
 - 🧮 **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
 - ⚡ **FFT Optimization**: Transformada rápida de Fourier para cross-correlation
 - 🔬 **Compatível com Python tslearn**: API similar ao tslearn Python
 - 🧪 **Bem testado**: Testes unitários abrangentes
 - 📈 **Séries Multivariadas**: Suporte completo para séries temporais multivariadas
-- 🎯 **DBA**: DTW Barycenter Averaging para centróides ótimos Java Implementation of Time Series Machine Learning
+- 🔄 **DBA**: DTW Barycenter Averaging para centróides ótimos Java Implementation of Time Series Machine Learning
 
 Uma implementação Java otimizada de algoritmos de machine learning para séries temporais, incluindo **KShape clustering** e **Dynamic Time Warping (DTW)**.
 
@@ -216,6 +217,54 @@ for (DTWNeighbors.NeighborResult neighbor : results) {
 }
 ```
 
+### Shapelets
+
+Os Shapelets são subsequências discriminativas que distinguem efetivamente entre classes de séries temporais:
+
+```java
+import org.tslearn.shapelets.*;
+
+// Criar dataset rotulado
+double[][][] X = /* séries temporais [n_samples][time_length][n_features] */;
+String[] y = /* labels [n_samples] */;
+
+// Configurar ShapeletTransform
+ShapeletTransform transform = new ShapeletTransform.Builder()
+    .numShapelets(50)                    // Número de shapelets a descobrir
+    .minShapeletLength(3)                // Comprimento mínimo
+    .maxShapeletLength(20)               // Comprimento máximo
+    .selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
+    .initializationMethod(ShapeletTransform.InitializationMethod.RANDOM)
+    .removeSimilar(true)                 // Remover shapelets similares
+    .verbose(true)                       // Logs detalhados
+    .randomSeed(42L)                     // Reprodutibilidade
+    .build();
+
+// Treinar e transformar
+double[][] features = transform.fitTransform(X, y);
+// features terá dimensões [n_samples][n_shapelets]
+
+// Analisar shapelets descobertos
+List<Shapelet> shapelets = transform.getShapelets();
+for (Shapelet s : shapelets.subList(0, Math.min(5, shapelets.size()))) {
+    System.out.printf("Qualidade: %.4f, Comprimento: %d, Classe: %s\n", 
+                     s.getQualityScore(), s.getLength(), s.getLabel());
+}
+
+// Transformar novos dados
+double[][] newFeatures = transform.transform(X_test);
+```
+
+**Características dos Shapelets:**
+- 🎯 **Descoberta automática**: Encontra padrões discriminativos nos dados
+- 📊 **Múltiplos métodos**: Information Gain, F-Statistic, Mood's Median, Kruskal-Wallis
+- 🔄 **Estratégias de inicialização**: Random, K-means, Class-balanced
+- 🧹 **Otimizações**: Remoção de shapelets similares, normalização automática
+- 📈 **Multivariado**: Suporte completo para séries temporais multivariadas
+
+**Documentação completa**: Ver `SHAPELETS_README.md` para detalhes e exemplos avançados.
+```
+
 ## Algoritmos Implementados
 
 ### KShape Clustering
@@ -328,7 +377,7 @@ Nossa implementação Java oferece:
 
 - [x] **KShape clustering** - Implementação completa
 - [x] **DTW (Dynamic Time Warping)** - Métricas e algoritmos
-- [ ] **K-Means temporal** - Clustering tradicional adaptado
+- [x] **K-Means temporal** - Clustering tradicional adaptado
 - [ ] **Shapelets** - Descoberta de padrões discriminativos
 - [ ] **Métricas avançadas** - LCSS, MSM, TWE
 - [ ] **Early classification** - Classificação precoce

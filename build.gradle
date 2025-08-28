@@ -4,7 +4,7 @@ plugins {
 }
 
 application {
-    mainClass = 'org.htc.Main'
+    mainClass = 'org.tslearn.examples.ShapeletTransformExample'
 }
 
 group = 'org.htc'
