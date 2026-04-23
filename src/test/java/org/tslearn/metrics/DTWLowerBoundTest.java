@@ -132,38 +132,43 @@ public class DTWLowerBoundTest {
     
     @Test
     public void testLowerBoundPerformance() {
-        // Create longer series for performance testing
-        double[] long1 = new double[100];
-        double[] long2 = new double[100];
-        
-        for (int i = 0; i < 100; i++) {
-            long1[i] = Math.sin(2 * Math.PI * i / 10.0);
-            long2[i] = Math.cos(2 * Math.PI * i / 10.0);
+        // Use longer series so the O(n*bw) vs O(n*bw) difference is measurable
+        int n = 500;
+        int bandWidth = 20;
+        double[] long1 = new double[n];
+        double[] long2 = new double[n];
+
+        for (int i = 0; i < n; i++) {
+            long1[i] = Math.sin(2 * Math.PI * i / 25.0);
+            long2[i] = Math.cos(2 * Math.PI * i / 25.0);
         }
-        
-        // Warmup JIT before timing to avoid cold-start skew
-        for (int w = 0; w < 20; w++) {
-            DTWLowerBound.lbKeogh(long1, long2, 10);
-            new DTW(10).distance(long1, long2);
+
+        // Create DTW instance once, outside the timed loop, to avoid allocation bias
+        DTW dtwInstance = new DTW(bandWidth);
+
+        // Warmup JIT thoroughly before measuring
+        for (int w = 0; w < 100; w++) {
+            DTWLowerBound.lbKeogh(long1, long2, bandWidth);
+            dtwInstance.distance(long1, long2);
         }
-        
-        // Measure aggregate time over many iterations for a stable comparison
-        int iterations = 200;
+
+        // Measure over many iterations for a stable comparison
+        int iterations = 500;
         long lbTotal = 0;
         long dtwTotal = 0;
         double lbKeogh = 0;
         double dtwDistance = 0;
-        
+
         for (int it = 0; it < iterations; it++) {
             long t = System.nanoTime();
-            lbKeogh = DTWLowerBound.lbKeogh(long1, long2, 10);
+            lbKeogh = DTWLowerBound.lbKeogh(long1, long2, bandWidth);
             lbTotal += System.nanoTime() - t;
-            
+
             t = System.nanoTime();
-            dtwDistance = new DTW(10).distance(long1, long2);
+            dtwDistance = dtwInstance.distance(long1, long2);
             dtwTotal += System.nanoTime() - t;
         }
-        
+
         assertTrue(lbKeogh <= dtwDistance + 1e-10, "LB_Keogh should be lower bound");
         assertTrue(lbTotal < dtwTotal, "Lower bound should be faster than full DTW");
     }

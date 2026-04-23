@@ -1,9 +1,13 @@
 package org.tslearn.examples;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tslearn.early_classification.*;
+import org.tslearn.early_classification.DTWNearestNeighbor;
+import org.tslearn.early_classification.EarlyClassifier;
+import org.tslearn.early_classification.FeatureBasedClassifier;
 
 /**
  * Exemplo completo de Early Classification para Séries Temporais.

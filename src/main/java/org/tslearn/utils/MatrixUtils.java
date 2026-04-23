@@ -2,7 +2,9 @@ package org.tslearn.utils;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.commons.math3.linear.*;
+
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.slf4j.Logger;

@@ -1,8 +1,13 @@
 package org.tslearn.examples;
 
-import org.tslearn.matrix_profile.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import java.util.*;
+import org.tslearn.matrix_profile.DiscordDiscovery;
+import org.tslearn.matrix_profile.MatrixProfile;
+import org.tslearn.matrix_profile.MotifDiscovery;
 
 /**
  * Comprehensive examples demonstrating Matrix Profile functionality.
