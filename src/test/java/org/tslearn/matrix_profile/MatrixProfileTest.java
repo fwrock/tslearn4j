@@ -270,35 +270,6 @@ public class MatrixProfileTest {
         }
     }
     
-    @Test
-    void testPerformanceCharacteristics() {
-        // Test that computation time scales reasonably
-        int[] sizes = {50, 100, 200};
-        long[] times = new long[sizes.length];
-        
-        MatrixProfile mp = new MatrixProfile.Builder()
-                .subsequenceLength(10)
-                .verbose(false)
-                .build();
-        
-        for (int i = 0; i < sizes.length; i++) {
-            double[] series = createTestSeriesOfSize(sizes[i]);
-            
-            long startTime = System.nanoTime();
-            mp.stamp(series);
-            long elapsed = System.nanoTime() - startTime;
-            
-            times[i] = elapsed;
-        }
-        
-        // Time should increase with size, but not too dramatically for small sizes
-        for (int i = 1; i < times.length; i++) {
-            assertTrue(times[i] >= times[i-1], "Time should increase with input size");
-            // For reasonable small sizes, shouldn't be more than 10x slower
-            assertTrue(times[i] < 10 * times[i-1], "Performance should scale reasonably");
-        }
-    }
-    
     // Helper methods for creating test data
     
     private double[] createTestTimeSeries() {

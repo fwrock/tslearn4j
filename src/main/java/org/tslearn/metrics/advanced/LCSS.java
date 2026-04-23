@@ -90,19 +90,23 @@ public class LCSS {
             throw new IllegalArgumentException("Séries temporais não podem ser null");
         }
         
+        if (ts1.length == 0 && ts2.length == 0) {
+            return 0.0; // Both empty — identical
+        }
+        
         if (ts1.length == 0 || ts2.length == 0) {
-            return 1.0; // Máxima dissimilaridade
+            return 1.0; // Maximum dissimilarity
         }
         
         int lcsLength = calculateLCS(ts1, ts2);
-        int minLength = Math.min(ts1.length, ts2.length);
+        int normLength = Math.max(ts1.length, ts2.length);
         
-        double similarity = (double) lcsLength / minLength;
+        double similarity = (double) lcsLength / normLength;
         double distance = 1.0 - similarity;
         
         if (verbose) {
-            logger.debug("LCSS: LCS={}, min_length={}, similarity={:.4f}, distance={:.4f}", 
-                        lcsLength, minLength, similarity, distance);
+            logger.debug("LCSS: LCS={}, norm_length={}, similarity={}, distance={}", 
+                        lcsLength, normLength, similarity, distance);
         }
         
         return distance;
@@ -129,14 +133,14 @@ public class LCSS {
         }
         
         int lcsLength = calculateMultivariateLCS(ts1, ts2);
-        int minLength = Math.min(ts1.length, ts2.length);
+        int normLength = Math.max(ts1.length, ts2.length);
         
-        double similarity = (double) lcsLength / minLength;
+        double similarity = (double) lcsLength / normLength;
         double distance = 1.0 - similarity;
         
         if (verbose) {
-            logger.debug("LCSS Multivariada: LCS={}, min_length={}, distance={:.4f}", 
-                        lcsLength, minLength, distance);
+            logger.debug("LCSS Multivariada: LCS={}, norm_length={}, distance={}", 
+                        lcsLength, normLength, distance);
         }
         
         return distance;

@@ -1,47 +1,37 @@
-# TS## Características
-
-- 🚀 **Performance otimizada**: Implementação pura Java usando Apache Commons Math
-- 📊 **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
-- 🔴 **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
-- 🟦 **TimeSeriesKMeans**: K-means temporal com métricas Euclidiana e DTW
-- 🎯 **Shapelets**: Descoberta de padrões discriminativos para classificação
-- 🧮 **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
-- ⚡ **FFT Optimization**: Transformada rápida de Fourier para cross-correlation
-- 🔬 **Compatível com Python tslearn**: API similar ao tslearn Python
-- 🧪 **Bem testado**: Testes unitários abrangentes
-- 📈 **Séries Multivariadas**: Suporte completo para séries temporais multivariadas
-- 🔄 **DBA**: DTW Barycenter Averaging para centróides ótimos Java Implementation of Time Series Machine Learning
+# TSLearn4J — Java Implementation of Time Series Machine Learning
 
 Uma implementação Java otimizada de algoritmos de machine learning para séries temporais, incluindo **KShape clustering** e **Dynamic Time Warping (DTW)**.
 
+Esta biblioteca é baseada na biblioteca Python [tslearn](https://tslearn.readthedocs.io/en/stable/), reimplementando seus algoritmos e APIs na plataforma JVM com foco em performance e tipagem estática.
+
 ## Características
 
-- 🚀 **Performance otimizada**: Implementação pura Java usando Apache Commons Math
-- 📊 **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
-- � **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
-- 🧮 **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
-- ⚡ **FFT Optimization**: Transformada rápida de Fourier para cross-correlation
-- 🔬 **Compatível com Python tslearn**: API similar ao tslearn Python
-- 🧪 **Bem testado**: Testes unitários abrangentes
+- **Performance otimizada**: Implementação pura Java usando Apache Commons Math
+- **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
+- **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
+- **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
+- **FFT Optimization**: Transformada rápida de Fourier para cross-correlation
+- **Compatível com Python tslearn**: API similar ao tslearn Python
+- **Bem testado**: Testes unitários abrangentes
 
 ## Instalação
 
 ### Gradle
 ```gradle
 dependencies {
-    implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'com.github.wendykierp:JTransforms:3.1'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'org.slf4j:slf4j-simple:1.7.36'
+implementation 'org.apache.commons:commons-math3:3.6.1'
+implementation 'com.github.wendykierp:JTransforms:3.1'
+implementation 'org.slf4j:slf4j-api:1.7.36'
+implementation 'org.slf4j:slf4j-simple:1.7.36'
 }
 ```
 
 ### Maven
 ```xml
 <dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-math3</artifactId>
-    <version>3.6.1</version>
+<groupId>org.apache.commons</groupId>
+<artifactId>commons-math3</artifactId>
+<version>3.6.1</version>
 </dependency>
 ```
 
@@ -54,17 +44,17 @@ import org.tslearn.clustering.KShape;
 
 // Dados de séries temporais (univariadas)
 double[][] data = {
-    {1.0, 2.0, 3.0, 2.0, 1.0},
-    {2.0, 3.0, 4.0, 3.0, 2.0},
-    {0.0, 1.0, 2.0, 1.0, 0.0}
+{1.0, 2.0, 3.0, 2.0, 1.0},
+{2.0, 3.0, 4.0, 3.0, 2.0},
+{0.0, 1.0, 2.0, 1.0, 0.0}
 };
 
 // Criar e treinar modelo KShape
 KShape kshape = new KShape.Builder()
-    .nClusters(2)
-    .maxIter(100)
-    .verbose(true)
-    .build();
+.nClusters(2)
+.maxIter(100)
+.verbose(true)
+.build();
 
 kshape.fit(data);
 int[] labels = kshape.getLabels();
@@ -82,26 +72,26 @@ double[][][] data = new double[50][30][2]; // 50 séries, 30 timesteps, 2 featur
 
 // K-means Euclidiano
 TimeSeriesKMeans euclideanKMeans = new TimeSeriesKMeans.Builder()
-    .nClusters(3)
-    .metric(TimeSeriesKMeans.Metric.EUCLIDEAN)
-    .maxIter(100)
-    .nInit(10)
-    .verbose(true)
-    .randomSeed(42)
-    .build();
+.nClusters(3)
+.metric(TimeSeriesKMeans.Metric.EUCLIDEAN)
+.maxIter(100)
+.nInit(10)
+.verbose(true)
+.randomSeed(42)
+.build();
 
 euclideanKMeans.fit(data);
 
 // K-means com DTW
 TimeSeriesKMeans dtwKMeans = new TimeSeriesKMeans.Builder()
-    .nClusters(3)
-    .metric(TimeSeriesKMeans.Metric.DTW)
-    .maxIter(50)
-    .maxIterBarycenter(15)
-    .nInit(5)
-    .verbose(true)
-    .randomSeed(42)
-    .build();
+.nClusters(3)
+.metric(TimeSeriesKMeans.Metric.DTW)
+.maxIter(50)
+.maxIterBarycenter(15)
+.nInit(5)
+.verbose(true)
+.randomSeed(42)
+.build();
 
 dtwKMeans.fit(data);
 
@@ -121,8 +111,8 @@ double distance = dtw.distance(series1, series2);
 
 // DTW com restrições Sakoe-Chiba
 DTW constrainedDTW = new DTW.Builder()
-    .sakoeChibaRadius(10)
-    .build();
+.sakoeChibaRadius(10)
+.build();
 
 double constrainedDistance = constrainedDTW.distance(series1, series2);
 
@@ -132,13 +122,13 @@ double distance = result.getDistance();
 List<int[]> path = result.getPath();
 ```
 KShape kshape = new KShape(
-    2,      // número de clusters
-    100,    // máximo de iterações
-    1e-6,   // tolerância para convergência
-    3,      // número de tentativas de inicialização
-    true,   // verbose
-    42L,    // random state
-    "random" // método de inicialização
+2,      // número de clusters
+100,    // máximo de iterações
+1e-6,   // tolerância para convergência
+3,      // número de tentativas de inicialização
+true,   // verbose
+42L,    // random state
+"random" // método de inicialização
 );
 
 // Treinar o modelo
@@ -159,25 +149,25 @@ RealMatrix[] centroids = kshape.getClusterCenters();
 
 ```java
 public class ExemploKShape {
-    public static void main(String[] args) {
-        // Gerar dados sintéticos
-        double[][] data = {
-            // Padrão crescente
-            {1, 2, 3, 4, 5},
-            {1.1, 2.1, 3.1, 4.1, 5.1},
-            
-            // Padrão decrescente  
-            {5, 4, 3, 2, 1},
-            {5.1, 4.1, 3.1, 2.1, 1.1}
-        };
-        
-        // Clustering
-        KShape kshape = new KShape(2, 50, 1e-4, 1, true, 42L, "random");
-        kshape.fit(data);
-        
-        System.out.println("Clusters: " + Arrays.toString(kshape.getLabels()));
-        System.out.println("Inertia: " + kshape.getInertia());
-    }
+public static void main(String[] args) {
+// Gerar dados sintéticos
+double[][] data = {
+// Padrão crescente
+{1, 2, 3, 4, 5},
+{1.1, 2.1, 3.1, 4.1, 5.1},
+
+// Padrão decrescente  
+{5, 4, 3, 2, 1},
+{5.1, 4.1, 3.1, 2.1, 1.1}
+};
+
+// Clustering
+KShape kshape = new KShape(2, 50, 1e-4, 1, true, 42L, "random");
+kshape.fit(data);
+
+System.out.println("Clusters: " + Arrays.toString(kshape.getLabels()));
+System.out.println("Inertia: " + kshape.getInertia());
+}
 }
 ```
 
@@ -212,8 +202,8 @@ DTWNeighbors neighbors = new DTWNeighbors(constrainedDTW, true, 4, true);
 List<DTWNeighbors.NeighborResult> results = neighbors.kNearest(query, dataset, 5);
 
 for (DTWNeighbors.NeighborResult neighbor : results) {
-    System.out.println("Index: " + neighbor.getIndex() + 
-                      ", Distance: " + neighbor.getDistance());
+System.out.println("Index: " + neighbor.getIndex() + 
+", Distance: " + neighbor.getDistance());
 }
 ```
 
@@ -230,15 +220,15 @@ String[] y = /* labels [n_samples] */;
 
 // Configurar ShapeletTransform
 ShapeletTransform transform = new ShapeletTransform.Builder()
-    .numShapelets(50)                    // Número de shapelets a descobrir
-    .minShapeletLength(3)                // Comprimento mínimo
-    .maxShapeletLength(20)               // Comprimento máximo
-    .selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
-    .initializationMethod(ShapeletTransform.InitializationMethod.RANDOM)
-    .removeSimilar(true)                 // Remover shapelets similares
-    .verbose(true)                       // Logs detalhados
-    .randomSeed(42L)                     // Reprodutibilidade
-    .build();
+.numShapelets(50)                    // Número de shapelets a descobrir
+.minShapeletLength(3)                // Comprimento mínimo
+.maxShapeletLength(20)               // Comprimento máximo
+.selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
+.initializationMethod(ShapeletTransform.InitializationMethod.RANDOM)
+.removeSimilar(true)                 // Remover shapelets similares
+.verbose(true)                       // Logs detalhados
+.randomSeed(42L)                     // Reprodutibilidade
+.build();
 
 // Treinar e transformar
 double[][] features = transform.fitTransform(X, y);
@@ -247,8 +237,8 @@ double[][] features = transform.fitTransform(X, y);
 // Analisar shapelets descobertos
 List<Shapelet> shapelets = transform.getShapelets();
 for (Shapelet s : shapelets.subList(0, Math.min(5, shapelets.size()))) {
-    System.out.printf("Qualidade: %.4f, Comprimento: %d, Classe: %s\n", 
-                     s.getQualityScore(), s.getLength(), s.getLabel());
+System.out.printf("Qualidade: %.4f, Comprimento: %d, Classe: %s\n", 
+s.getQualityScore(), s.getLength(), s.getLabel());
 }
 
 // Transformar novos dados
@@ -256,14 +246,13 @@ double[][] newFeatures = transform.transform(X_test);
 ```
 
 **Características dos Shapelets:**
-- 🎯 **Descoberta automática**: Encontra padrões discriminativos nos dados
-- 📊 **Múltiplos métodos**: Information Gain, F-Statistic, Mood's Median, Kruskal-Wallis
-- 🔄 **Estratégias de inicialização**: Random, K-means, Class-balanced
-- 🧹 **Otimizações**: Remoção de shapelets similares, normalização automática
-- 📈 **Multivariado**: Suporte completo para séries temporais multivariadas
+- **Descoberta automática**: Encontra padrões discriminativos nos dados
+- **Múltiplos métodos**: Information Gain, F-Statistic, Mood's Median, Kruskal-Wallis
+- **Estratégias de inicialização**: Random, K-means, Class-balanced
+- **Otimizações**: Remoção de shapelets similares, normalização automática
+- **Multivariado**: Suporte completo para séries temporais multivariadas
 
 **Documentação completa**: Ver `SHAPELETS_README.md` para detalhes e exemplos avançados.
-
 
 ## Algoritmos Implementados
 
@@ -271,10 +260,10 @@ double[][] newFeatures = transform.transform(X_test);
 
 O KShape é um algoritmo de clustering para séries temporais que:
 
-- 🔍 **Shape-based**: Agrupa séries por forma, não por valores absolutos
-- ⚡ **FFT Otimizado**: Usa transformada rápida de Fourier para cross-correlation
-- 🎯 **Robusto**: Tratamento de eigendecomposition failures com fallback
-- 📈 **Escalável**: Otimizações adaptativas baseadas no tamanho das séries
+- **Shape-based**: Agrupa séries por forma, não por valores absolutos
+- **FFT Otimizado**: Usa transformada rápida de Fourier para cross-correlation
+- **Robusto**: Tratamento de eigendecomposition failures com fallback
+- **Escalável**: Otimizações adaptativas baseadas no tamanho das séries
 
 ### Dynamic Time Warping (DTW)
 
@@ -283,41 +272,41 @@ Implementação otimizada de DTW com múltiplas estratégias de aceleração:
 #### Estratégias de Otimização
 
 - **Restrições Globais**:
-  - Sakoe-Chiba band: Limita warping a uma banda diagonal
-  - Itakura parallelogram: Restrição mais conservadora
-  
+- Sakoe-Chiba band: Limita warping a uma banda diagonal
+- Itakura parallelogram: Restrição mais conservadora
+
 - **Lower Bounds para Pruning**:
-  - LB_Yi: Lower bound baseado em primeiro/último elementos
-  - LB_Keogh: Lower bound com envelope baseado em banda
-  - LB_PAA: Lower bound usando Piecewise Aggregate Approximation
-  - LB_Improved: Combinação de múltiplos lower bounds
+- LB_Yi: Lower bound baseado em primeiro/último elementos
+- LB_Keogh: Lower bound com envelope baseado em banda
+- LB_PAA: Lower bound usando Piecewise Aggregate Approximation
+- LB_Improved: Combinação de múltiplos lower bounds
 
 - **Otimizações de Performance**:
-  - Memory-efficient: Usa apenas 2 linhas ao invés de matriz completa
-  - Early termination: Para quando threshold é excedido
-  - Parallel processing: Busca k-NN paralela para datasets grandes
-  - Lower bound cascade: Pruning em múltiplos níveis
+- Memory-efficient: Usa apenas 2 linhas ao invés de matriz completa
+- Early termination: Para quando threshold é excedido
+- Parallel processing: Busca k-NN paralela para datasets grandes
+- Lower bound cascade: Pruning em múltiplos níveis
 
-### 🚀 Early Classification (NOVO!)
+### Early Classification (NOVO!)
 
 Framework completo para **classificação de séries temporais em tempo real**, permitindo tomar decisões antes de observar toda a sequência.
 
 #### Características Principais
 
-- **🎯 Múltiplas Estratégias**: Confidence threshold, margin-based, probability stabilization, ensemble consensus
-- **🔄 Ensemble Inteligente**: Combina múltiplos classificadores (Shapelet, DTW k-NN, Feature-based)
-- **📊 Trade-off Configurável**: Balanceamento preciso entre accuracy e earliness
-- **⚡ Processamento Otimizado**: Paralelo, cache, early stopping
-- **📈 Avaliação Completa**: Métricas detalhadas e análise passo a passo
+- ** Múltiplas Estratégias**: Confidence threshold, margin-based, probability stabilization, ensemble consensus
+- ** Ensemble Inteligente**: Combina múltiplos classificadores (Shapelet, DTW k-NN, Feature-based)
+- ** Trade-off Configurável**: Balanceamento preciso entre accuracy e earliness
+- ** Processamento Otimizado**: Paralelo, cache, early stopping
+- ** Avaliação Completa**: Métricas detalhadas e análise passo a passo
 
 ```java
 // Configuração básica
 EarlyClassifier classifier = new EarlyClassifier.Builder()
-    .confidenceThreshold(0.8)
-    .minLength(5)
-    .stepSize(2)
-    .verbose(true)
-    .build();
+.confidenceThreshold(0.8)
+.minLength(5)
+.stepSize(2)
+.verbose(true)
+.build();
 
 // Treinar e classificar
 classifier.fit(trainingData, trainingLabels);
@@ -350,10 +339,10 @@ System.out.println("Earliness: " + result.getEarliness());
 
 #### Casos de Uso
 
-- 🏭 **Monitoramento Industrial**: Detecção precoce de anomalias
-- 🏥 **Diagnóstico Médico**: Classificação de sinais ECG em tempo real
-- 📱 **IoT e Sensores**: Reconhecimento de atividades humanas
-- 🔍 **Quality Control**: Detecção de defeitos em linhas de produção
+- **Monitoramento Industrial**: Detecção precoce de anomalias
+- **Diagnóstico Médico**: Classificação de sinais ECG em tempo real
+- **IoT e Sensores**: Reconhecimento de atividades humanas
+- **Quality Control**: Detecção de defeitos em linhas de produção
 
 ### Roadmap 2024
 
@@ -375,20 +364,20 @@ Implementação otimizada de DTW com múltiplas estratégias de aceleração:
 #### Estratégias de Otimização
 
 - **Restrições Globais**:
-  - Sakoe-Chiba band: Limita warping a uma banda diagonal
-  - Itakura parallelogram: Restrição mais conservadora
-  
+- Sakoe-Chiba band: Limita warping a uma banda diagonal
+- Itakura parallelogram: Restrição mais conservadora
+
 - **Lower Bounds para Pruning**:
-  - LB_Yi: Lower bound baseado em primeiro/último elementos
-  - LB_Keogh: Lower bound com envelope baseado em banda
-  - LB_PAA: Lower bound usando Piecewise Aggregate Approximation
-  - LB_Improved: Combinação de múltiplos lower bounds
+- LB_Yi: Lower bound baseado em primeiro/último elementos
+- LB_Keogh: Lower bound com envelope baseado em banda
+- LB_PAA: Lower bound usando Piecewise Aggregate Approximation
+- LB_Improved: Combinação de múltiplos lower bounds
 
 - **Otimizações de Performance**:
-  - Memory-efficient: Usa apenas 2 linhas ao invés de matriz completa
-  - Early termination: Para quando threshold é excedido
-  - Parallel processing: Busca k-NN paralela para datasets grandes
-  - Lower bound cascade: Pruning em múltiplos níveis
+- Memory-efficient: Usa apenas 2 linhas ao invés de matriz completa
+- Early termination: Para quando threshold é excedido
+- Parallel processing: Busca k-NN paralela para datasets grandes
+- Lower bound cascade: Pruning em múltiplos níveis
 
 1. **Usa correlação cruzada normalizada** como medida de similaridade
 2. **É invariante a deslocamento temporal** (time shift invariant)
@@ -434,8 +423,8 @@ src/main/java/org/tslearn/
 ├── preprocessing/
 │   └── TimeSeriesScalerMeanVariance.java # Normalização
 └── utils/
-    ├── MatrixUtils.java      # Utilitários de matriz
-    └── EmptyClusterException.java # Exceções
+├── MatrixUtils.java      # Utilitários de matriz
+└── EmptyClusterException.java # Exceções
 ```
 
 ## Performance
@@ -451,11 +440,11 @@ Nossa implementação Java oferece:
 
 | Característica | TSLearn4J | Python tslearn |
 |----------------|-----------|----------------|
-| Performance | ⚡ Rápido | 🐌 Mais lento |
-| Memoria | 💾 Eficiente | 🔄 GC pesado |
-| Dependências | 📦 Minimal | 🏗️ NumPy/SciPy |
-| Tipagem | ✅ Forte | ⚠️ Dinâmica |
-| Ecosystem | 🔧 JVM | 🐍 Python ML |
+| Performance |  Rápido |  Mais lento |
+| Memoria |  Eficiente |  GC pesado |
+| Dependências |  Minimal |  NumPy/SciPy |
+| Tipagem |  Forte |  Dinâmica |
+| Ecosystem |  JVM |  Python ML |
 
 ## Contribuição
 
@@ -473,7 +462,7 @@ Nossa implementação Java oferece:
 - [x] **Shapelets** - Descoberta de padrões discriminativos
 - [x] **Métricas avançadas** - LCSS, MSM, TWE
 - [x] **Early classification** - Classificação precoce
-- [ ] **Matrix Profile** - Motifs e discords
+- [x] **Matrix Profile** - Motifs e discords
 - [ ] **Paralelização** - Processamento multi-thread
 
 ## Licença
@@ -486,13 +475,13 @@ Se usar este projeto em pesquisa acadêmica, por favor cite:
 
 ```bibtex
 @software{tslearn4j,
-  title={TSLearn4J: Java Implementation of Time Series Machine Learning},
-  author={Francisco Wallison Rocha},
-  year={2025},
-  url={https://github.com/fwrock/tslearn4j}
+title={TSLearn4J: Java Implementation of Time Series Machine Learning},
+author={Francisco Wallison Rocha},
+year={2025},
+url={https://github.com/fwrock/tslearn4j}
 }
 ```
 
 ---
 
-**Nota**: Esta é uma implementação independente inspirada no [tslearn](https://github.com/tslearn-team/tslearn) Python, otimizada para performance em ambiente JVM.
+**Nota**: Esta é uma implementação baseada na biblioteca Python [tslearn](https://tslearn.readthedocs.io/en/stable/), reimplementando seus algoritmos na plataforma JVM com foco em performance e tipagem estática.

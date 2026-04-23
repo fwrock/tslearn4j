@@ -379,7 +379,7 @@ public class DTW {
     /**
      * Euclidean distance between two points
      */
-    private double euclideanDistance(double x1, double x2) {
+    protected double euclideanDistance(double x1, double x2) {
         double diff = x1 - x2;
         return diff * diff; // Squared distance (standard for DTW)
     }

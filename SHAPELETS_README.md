@@ -6,13 +6,13 @@ Esta implementação fornece funcionalidade completa de **Shapelets** para anál
 
 ## Características Principais
 
-### 🎯 Shapelet Individual
+### Shapelet Individual
 - **Representação de padrões discriminativos**: Cada shapelet representa uma subsequência que caracteriza uma classe
 - **Cálculo de distâncias**: Múltiplas métricas de distância para matching
 - **Normalização automática**: Z-score normalization para comparações robustas
 - **Transformação de datasets**: Conversão de séries temporais em features baseadas em distâncias
 
-### 🔍 ShapeletTransform
+### ShapeletTransform
 - **Descoberta automática**: Algoritmos para encontrar os melhores shapelets discriminativos
 - **Múltiplos métodos de seleção**: Information Gain, F-Statistic, Mood's Median, Kruskal-Wallis
 - **Estratégias de inicialização**: Random, K-means, Class-balanced
@@ -43,17 +43,17 @@ double[] distances = shapelet.transform(dataset);
 ```java
 // Configurar transformador
 ShapeletTransform transform = new ShapeletTransform.Builder()
-    .numShapelets(50)                    // Número de shapelets a descobrir
-    .minShapeletLength(3)                // Comprimento mínimo
-    .maxShapeletLength(20)               // Comprimento máximo
-    .maxCandidates(10000)                // Máximo de candidatos a avaliar
-    .selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
-    .initializationMethod(ShapeletTransform.InitializationMethod.RANDOM)
-    .removeSimilar(true)                 // Remover shapelets similares
-    .similarityThreshold(0.1)            // Threshold de similaridade
-    .verbose(true)                       // Logs detalhados
-    .randomSeed(42L)                     // Seed para reprodutibilidade
-    .build();
+.numShapelets(50)                    // Número de shapelets a descobrir
+.minShapeletLength(3)                // Comprimento mínimo
+.maxShapeletLength(20)               // Comprimento máximo
+.maxCandidates(10000)                // Máximo de candidatos a avaliar
+.selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
+.initializationMethod(ShapeletTransform.InitializationMethod.RANDOM)
+.removeSimilar(true)                 // Remover shapelets similares
+.similarityThreshold(0.1)            // Threshold de similaridade
+.verbose(true)                       // Logs detalhados
+.randomSeed(42L)                     // Seed para reprodutibilidade
+.build();
 
 // Treinar com dados rotulados
 double[][][] X_train = /* dados de treino [n_samples][time_length][n_features] */;
@@ -68,9 +68,9 @@ double[][] X_transformed = transform.transform(X_train);
 // Analisar shapelets descobertos
 List<Shapelet> shapelets = transform.getShapelets();
 for (int i = 0; i < Math.min(5, shapelets.size()); i++) {
-    Shapelet s = shapelets.get(i);
-    System.out.printf("Shapelet %d: Qualidade=%.4f, Comprimento=%d\n", 
-                     i+1, s.getQualityScore(), s.getLength());
+Shapelet s = shapelets.get(i);
+System.out.printf("Shapelet %d: Qualidade=%.4f, Comprimento=%d\n", 
+i+1, s.getQualityScore(), s.getLength());
 }
 ```
 
@@ -127,64 +127,64 @@ import org.tslearn.shapelets.*;
 import java.util.Random;
 
 public class ShapeletExample {
-    public static void main(String[] args) {
-        // Gerar dataset sintético
-        int nSamples = 100;
-        int timeLength = 50;
-        int nFeatures = 1;
-        
-        double[][][] X = new double[nSamples][timeLength][nFeatures];
-        String[] y = new String[nSamples];
-        Random random = new Random(42);
-        
-        // Padrões discriminativos
-        double[][] patternA = {{1.0}, {2.0}, {1.0}};
-        double[][] patternB = {{-1.0}, {-2.0}, {-1.0}};
-        
-        for (int i = 0; i < nSamples; i++) {
-            y[i] = (i % 2 == 0) ? "ClassA" : "ClassB";
-            
-            // Ruído de fundo
-            for (int t = 0; t < timeLength; t++) {
-                X[i][t][0] = random.nextGaussian() * 0.3;
-            }
-            
-            // Inserir padrão discriminativo
-            double[][] pattern = y[i].equals("ClassA") ? patternA : patternB;
-            int insertPos = random.nextInt(timeLength - pattern.length + 1);
-            
-            for (int j = 0; j < pattern.length; j++) {
-                X[i][insertPos + j][0] = pattern[j][0] + random.nextGaussian() * 0.1;
-            }
-        }
-        
-        // Configurar e treinar transformador
-        ShapeletTransform transform = new ShapeletTransform.Builder()
-            .numShapelets(10)
-            .minShapeletLength(3)
-            .maxShapeletLength(5)
-            .selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
-            .verbose(true)
-            .randomSeed(42L)
-            .build();
-        
-        // Treinar e transformar
-        double[][] features = transform.fitTransform(X, y);
-        
-        System.out.printf("Dataset original: [%d, %d, %d]\n", 
-                         X.length, X[0].length, X[0][0].length);
-        System.out.printf("Features extraídas: [%d, %d]\n", 
-                         features.length, features[0].length);
-        System.out.printf("Shapelets descobertos: %d\n", 
-                         transform.getNumShapelets());
-        
-        // Analisar qualidade dos shapelets
-        double avgQuality = transform.getShapelets().stream()
-            .mapToDouble(Shapelet::getQualityScore)
-            .average().orElse(0.0);
-        
-        System.out.printf("Qualidade média dos shapelets: %.4f\n", avgQuality);
-    }
+public static void main(String[] args) {
+// Gerar dataset sintético
+int nSamples = 100;
+int timeLength = 50;
+int nFeatures = 1;
+
+double[][][] X = new double[nSamples][timeLength][nFeatures];
+String[] y = new String[nSamples];
+Random random = new Random(42);
+
+// Padrões discriminativos
+double[][] patternA = {{1.0}, {2.0}, {1.0}};
+double[][] patternB = {{-1.0}, {-2.0}, {-1.0}};
+
+for (int i = 0; i < nSamples; i++) {
+y[i] = (i % 2 == 0) ? "ClassA" : "ClassB";
+
+// Ruído de fundo
+for (int t = 0; t < timeLength; t++) {
+X[i][t][0] = random.nextGaussian() * 0.3;
+}
+
+// Inserir padrão discriminativo
+double[][] pattern = y[i].equals("ClassA") ? patternA : patternB;
+int insertPos = random.nextInt(timeLength - pattern.length + 1);
+
+for (int j = 0; j < pattern.length; j++) {
+X[i][insertPos + j][0] = pattern[j][0] + random.nextGaussian() * 0.1;
+}
+}
+
+// Configurar e treinar transformador
+ShapeletTransform transform = new ShapeletTransform.Builder()
+.numShapelets(10)
+.minShapeletLength(3)
+.maxShapeletLength(5)
+.selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
+.verbose(true)
+.randomSeed(42L)
+.build();
+
+// Treinar e transformar
+double[][] features = transform.fitTransform(X, y);
+
+System.out.printf("Dataset original: [%d, %d, %d]\n", 
+X.length, X[0].length, X[0][0].length);
+System.out.printf("Features extraídas: [%d, %d]\n", 
+features.length, features[0].length);
+System.out.printf("Shapelets descobertos: %d\n", 
+transform.getNumShapelets());
+
+// Analisar qualidade dos shapelets
+double avgQuality = transform.getShapelets().stream()
+.mapToDouble(Shapelet::getQualityScore)
+.average().orElse(0.0);
+
+System.out.printf("Qualidade média dos shapelets: %.4f\n", avgQuality);
+}
 }
 ```
 
@@ -193,9 +193,9 @@ public class ShapeletExample {
 ```java
 // 1. Extração de features com Shapelets
 ShapeletTransform shapeletTransform = new ShapeletTransform.Builder()
-    .numShapelets(100)
-    .selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
-    .build();
+.numShapelets(100)
+.selectionMethod(ShapeletTransform.ShapeletSelectionMethod.INFORMATION_GAIN)
+.build();
 
 double[][] features_train = shapeletTransform.fitTransform(X_train, y_train);
 double[][] features_test = shapeletTransform.transform(X_test);
@@ -252,14 +252,14 @@ double[][] test_features = shapeletTransform.transform(X_test);
 
 | Funcionalidade | TSLearn4J | Python tslearn | Status |
 |----------------|-----------|----------------|--------|
-| Shapelet individual | ✅ | ✅ | Completo |
-| ShapeletTransform | ✅ | ✅ | Completo |
-| Information Gain | ✅ | ✅ | Completo |
-| Multiple selection methods | ✅ | ✅ | Completo |
-| Initialization strategies | ✅ | ✅ | Completo |
-| Multivariate support | ✅ | ✅ | Completo |
-| Normalization | ✅ | ✅ | Completo |
-| Learning Shapelets | 🚧 | ✅ | Em desenvolvimento |
+| Shapelet individual |  |  | Completo |
+| ShapeletTransform |  |  | Completo |
+| Information Gain |  |  | Completo |
+| Multiple selection methods |  |  | Completo |
+| Initialization strategies |  |  | Completo |
+| Multivariate support |  |  | Completo |
+| Normalization |  |  | Completo |
+| Learning Shapelets |  |  | Em desenvolvimento |
 
 ## Recursos Adicionais
 

@@ -1,6 +1,9 @@
 package org.tslearn.metrics;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -138,15 +141,30 @@ public class DTWLowerBoundTest {
             long2[i] = Math.cos(2 * Math.PI * i / 10.0);
         }
         
-        long startTime = System.nanoTime();
-        double lbKeogh = DTWLowerBound.lbKeogh(long1, long2, 10);
-        long lbTime = System.nanoTime() - startTime;
+        // Warmup JIT before timing to avoid cold-start skew
+        for (int w = 0; w < 20; w++) {
+            DTWLowerBound.lbKeogh(long1, long2, 10);
+            new DTW(10).distance(long1, long2);
+        }
         
-        startTime = System.nanoTime();
-        double dtwDistance = new DTW(10).distance(long1, long2);
-        long dtwTime = System.nanoTime() - startTime;
+        // Measure aggregate time over many iterations for a stable comparison
+        int iterations = 200;
+        long lbTotal = 0;
+        long dtwTotal = 0;
+        double lbKeogh = 0;
+        double dtwDistance = 0;
+        
+        for (int it = 0; it < iterations; it++) {
+            long t = System.nanoTime();
+            lbKeogh = DTWLowerBound.lbKeogh(long1, long2, 10);
+            lbTotal += System.nanoTime() - t;
+            
+            t = System.nanoTime();
+            dtwDistance = new DTW(10).distance(long1, long2);
+            dtwTotal += System.nanoTime() - t;
+        }
         
         assertTrue(lbKeogh <= dtwDistance + 1e-10, "LB_Keogh should be lower bound");
-        assertTrue(lbTime < dtwTime, "Lower bound should be faster than full DTW");
+        assertTrue(lbTotal < dtwTotal, "Lower bound should be faster than full DTW");
     }
 }

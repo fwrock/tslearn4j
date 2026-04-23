@@ -58,25 +58,22 @@ public class DTWLowerBound {
     
     /**
      * Create envelope (upper and lower bounds) for a time series
-     * given a Sakoe-Chiba band constraint
+     * given a Sakoe-Chiba band constraint.
      */
     private static void createEnvelope(double[] series, int bandWidth, double[] upper, double[] lower) {
         int n = series.length;
-        
         for (int i = 0; i < n; i++) {
             int start = Math.max(0, i - bandWidth);
             int end = Math.min(n - 1, i + bandWidth);
-            
-            double min = Double.POSITIVE_INFINITY;
-            double max = Double.NEGATIVE_INFINITY;
-            
-            for (int j = start; j <= end; j++) {
-                min = Math.min(min, series[j]);
-                max = Math.max(max, series[j]);
+            double min = series[start];
+            double max = series[start];
+            for (int j = start + 1; j <= end; j++) {
+                double v = series[j];
+                if (v > max) max = v;
+                else if (v < min) min = v;
             }
-            
-            lower[i] = min;
             upper[i] = max;
+            lower[i] = min;
         }
     }
     
