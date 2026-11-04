@@ -9,7 +9,7 @@ application {
 }
 
 group = 'org.htc'
-version = '1.0'
+version = '1.1.0-SNAPSHOT'
 
 java {
     toolchain { languageVersion = JavaLanguageVersion.of(21) }
@@ -78,4 +78,8 @@ publishing {
             }
         }
     }
+}
+// Preserve notices for the compatible random-stream implementation in published artifacts.
+tasks.named('jar') {
+    from(project.files('LICENSE', 'NOTICE')) { into 'META-INF' }
 }

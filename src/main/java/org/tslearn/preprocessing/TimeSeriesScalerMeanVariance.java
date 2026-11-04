@@ -4,6 +4,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import org.tslearn.utils.TimeSeriesMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +92,7 @@ public class TimeSeriesScalerMeanVariance {
             int sz = X[i].getRowDimension();
             int d = X[i].getColumnDimension();
             
-            result[i] = new Array2DRowRealMatrix(sz, d);
+            result[i] = new TimeSeriesMatrix(sz, d);
             
             // Apply transformation: (x - mean) / std * target_std + target_mean
             for (int j = 0; j < sz; j++) {
@@ -154,7 +155,7 @@ public class TimeSeriesScalerMeanVariance {
             int sz = X[i].getRowDimension();
             int d = X[i].getColumnDimension();
             
-            result[i] = new Array2DRowRealMatrix(sz, d);
+            result[i] = new TimeSeriesMatrix(sz, d);
             
             for (int j = 0; j < sz; j++) {
                 for (int k = 0; k < d; k++) {

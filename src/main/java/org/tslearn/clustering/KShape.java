@@ -44,7 +44,6 @@ public class KShape {
     // Working variables
     private double[] norms;
     private double[] normsCentroids;
-    private RealMatrix[] XFit;
     
     /**
      * Constructor with default parameters
@@ -114,8 +113,13 @@ public class KShape {
             mean /= sz;
             for (int j = 0; j < sz; j++) centred[i * sz + j] = row[j] - mean;
         }
-        double[] covariance = NativeLinearAlgebra.gram(centred, clusterData.length, sz);
-        double[] eigenvector = NativeLinearAlgebra.leadingEigenvectors(covariance, sz, 1)[0];
+        double[] eigenvector;
+        if (clusterData.length < sz) {
+            eigenvector = NativeLinearAlgebra.rightSingularSystem(centred, clusterData.length, sz, 1).vectors()[0];
+        } else {
+            double[] covariance = NativeLinearAlgebra.gram(centred, clusterData.length, sz);
+            eigenvector = NativeLinearAlgebra.leadingEigenvectors(covariance, sz, 1)[0];
+        }
         RealMatrix muK = MatrixUtils.arrayToMatrix(eigenvector);
 
         // Choose sign based on distance minimization
@@ -304,11 +308,6 @@ public class KShape {
             if (ts.getRowDimension() != sz || ts.getColumnDimension() != d) {
                 throw new IllegalArgumentException("All time series must have same dimensions");
             }
-        }
-        
-        XFit = new RealMatrix[X.length];
-        for (int i = 0; i < X.length; i++) {
-            XFit[i] = MatrixUtils.copy(X[i]);
         }
         
         norms = MatrixUtils.computeNorms(X);

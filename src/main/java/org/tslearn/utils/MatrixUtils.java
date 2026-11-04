@@ -33,7 +33,7 @@ public class MatrixUtils {
         RealMatrix[] result = new RealMatrix[nTs];
         
         for (int i = 0; i < nTs; i++) {
-            result[i] = new Array2DRowRealMatrix(sz, d);
+            result[i] = new TimeSeriesMatrix(sz, d);
             for (int j = 0; j < sz; j++) {
                 for (int k = 0; k < d; k++) {
                     result[i].setEntry(j, k, data[i][j][k]);
@@ -58,7 +58,7 @@ public class MatrixUtils {
         RealMatrix[] result = new RealMatrix[nTs];
         
         for (int i = 0; i < nTs; i++) {
-            result[i] = new Array2DRowRealMatrix(sz, 1);
+            result[i] = new TimeSeriesMatrix(sz, 1);
             for (int j = 0; j < sz; j++) {
                 result[i].setEntry(j, 0, data[i][j]);
             }
@@ -267,7 +267,7 @@ public class MatrixUtils {
      * Convert 1D array to RealMatrix column vector
      */
     public static RealMatrix arrayToMatrix(double[] array) {
-        RealMatrix result = new Array2DRowRealMatrix(array.length, 1);
+        RealMatrix result = new TimeSeriesMatrix(array.length, 1);
         for (int i = 0; i < array.length; i++) {
             result.setEntry(i, 0, array[i]);
         }

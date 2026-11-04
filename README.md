@@ -16,24 +16,34 @@ Esta biblioteca é baseada na biblioteca Python [tslearn](https://tslearn.readth
 
 ## Instalação
 
+Build and publish the Java 21 library to the local Maven repository:
+
+```bash
+./gradlew test publishToMavenLocal
+```
+
 ### Gradle
+
 ```gradle
-dependencies {
-implementation 'org.apache.commons:commons-math3:3.6.1'
-implementation 'com.github.wendykierp:JTransforms:3.1'
-implementation 'org.slf4j:slf4j-api:1.7.36'
-implementation 'org.slf4j:slf4j-simple:1.7.36'
-}
+repositories { mavenLocal(); mavenCentral() }
+dependencies { implementation 'org.htc:tslearn4j:1.1.0-SNAPSHOT' }
 ```
 
 ### Maven
+
 ```xml
 <dependency>
-<groupId>org.apache.commons</groupId>
-<artifactId>commons-math3</artifactId>
-<version>3.6.1</version>
+  <groupId>org.htc</groupId>
+  <artifactId>tslearn4j</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
+
+The native SimEDaPE primitives include thin SVD/PCA, rank-deficient least squares,
+column-pivoted QR, primitive-buffer matrices, six SciPy interpolation methods,
+NumPy/CPython-compatible seeded sampling, and exact constrained DTW paths matching
+the dtaidistance reference. OpenBLAS/LAPACK is supplied through JavaCPP. See `NOTICE`
+for upstream algorithm attributions. Building requires JDK 21 or newer.
 
 ## Uso Rápido
 
