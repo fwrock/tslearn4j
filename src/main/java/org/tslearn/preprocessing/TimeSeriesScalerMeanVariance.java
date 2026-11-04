@@ -47,7 +47,7 @@ public class TimeSeriesScalerMeanVariance {
         this.stdPerSeries = new double[nTs];
         
         Mean meanCalc = new Mean();
-        StandardDeviation stdCalc = new StandardDeviation();
+        StandardDeviation stdCalc = new StandardDeviation(false);
         
         for (int i = 0; i < nTs; i++) {
             // Flatten time series to 1D for statistics calculation
@@ -64,7 +64,7 @@ public class TimeSeriesScalerMeanVariance {
             
             // Avoid division by zero
             if (stdPerSeries[i] == 0.0) {
-                stdPerSeries[i] = 1e-8;
+                stdPerSeries[i] = 1.0;
             }
         }
         
@@ -139,7 +139,7 @@ public class TimeSeriesScalerMeanVariance {
         }
         
         Mean meanCalc = new Mean();
-        StandardDeviation stdCalc = new StandardDeviation();
+        StandardDeviation stdCalc = new StandardDeviation(false);
         
         double globalMean = meanCalc.evaluate(allValues);
         double globalStd = stdCalc.evaluate(allValues);

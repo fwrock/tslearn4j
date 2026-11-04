@@ -141,9 +141,10 @@ public class MatrixUtils {
     public static double computeInertia(double[][] distances, int[] labels) {
         double inertia = 0.0;
         for (int i = 0; i < labels.length; i++) {
-            inertia += distances[i][labels[i]];
+            double distance = distances[i][labels[i]];
+            inertia += distance * distance;
         }
-        return inertia;
+        return inertia / labels.length;
     }
     
     /**

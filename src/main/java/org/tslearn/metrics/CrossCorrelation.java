@@ -155,7 +155,7 @@ public class CrossCorrelation {
                 double corr = 0.0;
                 
                 for (int i = 0; i < sz; i++) {
-                    int j = i + shift;
+                    int j = i - shift;
                     if (j >= 0 && j < sz) {
                         corr += centroid[i] * ts[j];
                     }

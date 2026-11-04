@@ -1,9 +1,7 @@
 package org.tslearn.clustering;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.slf4j.Logger;
@@ -12,6 +10,7 @@ import org.tslearn.metrics.CrossCorrelation;
 import org.tslearn.preprocessing.TimeSeriesScalerMeanVariance;
 import org.tslearn.utils.EmptyClusterException;
 import org.tslearn.utils.MatrixUtils;
+import org.tslearn.utils.NativeLinearAlgebra;
 
 /**
  * KShape clustering for time series.
@@ -105,60 +104,29 @@ public class KShape {
             clusterNorms
         );
         
-        // Convert to 2D matrix for S = X^T * X computation
-        RealMatrix XpMatrix = new Array2DRowRealMatrix(clusterData.length, sz);
+        // Xp Q centres each aligned series. (Xp Q)^T (Xp Q) equals
+        // Q^T Xp^T Xp Q, without building Q or three dense matrix products.
+        double[] centred = new double[Math.multiplyExact(clusterData.length, sz)];
         for (int i = 0; i < clusterData.length; i++) {
             double[] row = MatrixUtils.matrixToArray(Xp[i]);
-            for (int j = 0; j < sz; j++) {
-                XpMatrix.setEntry(i, j, row[j]);
-            }
+            double mean = 0.0;
+            for (double value : row) mean += value;
+            mean /= sz;
+            for (int j = 0; j < sz; j++) centred[i * sz + j] = row[j] - mean;
         }
-        
-        // Compute S = X^T * X
-        RealMatrix S = XpMatrix.transpose().multiply(XpMatrix);
-        
-        // Compute Q = I - 1/sz * 1*1^T
-        RealMatrix Q = MatrixUtils.eye(sz).subtract(
-            MatrixUtils.ones(sz, sz).scalarMultiply(1.0 / sz));
-        
-        // Compute M = Q^T * S * Q
-        RealMatrix M = Q.transpose().multiply(S).multiply(Q);
-        
-        // Find principal eigenvector using Apache Commons Math
-        EigenDecomposition eigenDecomp;
-        try {
-            eigenDecomp = new EigenDecomposition(M);
-        } catch (Exception e) {
-            // If eigendecomposition fails, fall back to simple centroid
-            logger.warn("Eigendecomposition failed, using simple centroid: " + e.getMessage());
-            RealMatrix simpleCentroid = computeSimpleCentroid(clusterData);
-            return simpleCentroid;
-        }
-        
-        // Get eigenvector corresponding to largest eigenvalue
-        int maxEigenIdx = 0;
-        double maxEigenVal = eigenDecomp.getRealEigenvalue(0);
-        for (int i = 1; i < eigenDecomp.getRealEigenvalues().length; i++) {
-            if (eigenDecomp.getRealEigenvalue(i) > maxEigenVal) {
-                maxEigenVal = eigenDecomp.getRealEigenvalue(i);
-                maxEigenIdx = i;
-            }
-        }
-        
-        RealVector eigenVector = eigenDecomp.getEigenvector(maxEigenIdx);
-        RealMatrix muK = new Array2DRowRealMatrix(sz, 1);
-        for (int i = 0; i < sz; i++) {
-            muK.setEntry(i, 0, eigenVector.getEntry(i));
-        }
-        
+        double[] covariance = NativeLinearAlgebra.gram(centred, clusterData.length, sz);
+        double[] eigenvector = NativeLinearAlgebra.leadingEigenvectors(covariance, sz, 1)[0];
+        RealMatrix muK = MatrixUtils.arrayToMatrix(eigenvector);
+
         // Choose sign based on distance minimization
         double distPlusMu = 0.0;
         double distMinusMu = 0.0;
         
+        RealMatrix negativeMu = muK.scalarMultiply(-1);
         for (int i = 0; i < clusterData.length; i++) {
             RealMatrix xi = Xp[i];
             distPlusMu += computeEuclideanDistance(xi, muK);
-            distMinusMu += computeEuclideanDistance(xi, muK.scalarMultiply(-1));
+            distMinusMu += computeEuclideanDistance(xi, negativeMu);
         }
         
         if (distMinusMu < distPlusMu) {
@@ -220,8 +188,7 @@ public class KShape {
         }
         
         // Normalize centroids
-        clusterCenters = TimeSeriesScalerMeanVariance.globalTransform(
-            clusterCenters, 0.0, 1.0);
+        clusterCenters = new TimeSeriesScalerMeanVariance().fitTransform(clusterCenters);
         
         // Update centroid norms
         normsCentroids = MatrixUtils.computeNorms(clusterCenters);
@@ -346,6 +313,7 @@ public class KShape {
         
         norms = MatrixUtils.computeNorms(X);
         
+        fitted = false;
         int maxAttempts = init instanceof RealMatrix[] ? 1 : Math.max(nInit, 10);
         
         labels = null;
@@ -382,6 +350,9 @@ public class KShape {
             }
         }
         
+        if (bestCentroids == null) {
+            throw new EmptyClusterException("No initialization produced all requested clusters");
+        }
         if (bestCentroids != null) {
             clusterCenters = bestCentroids;
             inertia = minInertia;
@@ -422,7 +393,7 @@ public class KShape {
         }
         
         // Normalize input data
-        RealMatrix[] XNormalized = TimeSeriesScalerMeanVariance.globalTransform(X, 0.0, 1.0);
+        RealMatrix[] XNormalized = new TimeSeriesScalerMeanVariance().fitTransform(X);
         double[] inputNorms = MatrixUtils.computeNorms(XNormalized);
         
         // Compute distances

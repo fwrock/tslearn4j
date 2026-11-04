@@ -6,7 +6,7 @@ Esta biblioteca é baseada na biblioteca Python [tslearn](https://tslearn.readth
 
 ## Características
 
-- **Performance otimizada**: Implementação pura Java usando Apache Commons Math
+- **Performance otimizada**: K-Shape usa OpenBLAS/LAPACK nativo via JavaCPP; FFT usa JTransforms
 - **Algoritmo KShape**: Clustering baseado em correlação cruzada normalizada
 - **DTW Otimizada**: Dynamic Time Warping com múltiplas estratégias de aceleração
 - **Lower Bounds**: LB_Keogh, LB_Yi, LB_PAA e LB_Improved para busca rápida
@@ -431,7 +431,7 @@ src/main/java/org/tslearn/
 
 Nossa implementação Java oferece:
 
-- **Velocidade**: 2-5x mais rápida que implementações Python equivalentes
+- **Velocidade**: deve ser medida com o mesmo algoritmo, dados e hardware; não há fator universal de ganho
 - **Memória**: Uso eficiente com Apache Commons Math
 - **Escalabilidade**: Suporta datasets grandes sem problemas de GC
 - **Paralelização**: Preparada para processamento paralelo futuro
@@ -485,3 +485,29 @@ url={https://github.com/fwrock/tslearn4j}
 ---
 
 **Nota**: Esta é uma implementação baseada na biblioteca Python [tslearn](https://tslearn.readthedocs.io/en/stable/), reimplementando seus algoritmos na plataforma JVM com foco em performance e tipagem estática.
+
+
+## Java 21 and native numerical backend
+
+Build with JDK 21 and the checked-in Gradle 9.8.2 wrapper:
+
+```bash
+./gradlew test publishToMavenLocal
+```
+
+K-Shape now uses double-precision OpenBLAS covariance multiplication and LAPACK
+symmetric eigendecomposition through JavaCPP (`openblas-platform`). Commons Math
+remains the matrix-facing API and supports other existing algorithms. Native
+libraries are bundled for supported platforms; unsupported systems fail to load
+the backend rather than silently changing the numerical method.
+
+The scaler uses population variance per series. K-Shape prediction normalizes
+each series independently, inertia is the mean squared assigned distance, and
+an impossible clustering fails explicitly. Existing models trained with the
+older global normalization should be retrained before comparing predictions.
+
+Use `OPENBLAS_NUM_THREADS=1` when running many concurrent outer workers as a
+starting point, and benchmark other thread counts on the deployment hardware.
+The additional tests cover numerical residuals, normalization, offset/scale
+invariance and empty-cluster failure. Cross-language fixtures are in the parent
+`experiments/simedape-language-review` directory.
