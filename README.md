@@ -45,6 +45,17 @@ NumPy/CPython-compatible seeded sampling, and exact constrained DTW paths matchi
 the dtaidistance reference. OpenBLAS/LAPACK is supplied through JavaCPP. See `NOTICE`
 for upstream algorithm attributions. Building requires JDK 21 or newer.
 
+## SimEDaPE integration
+
+[simedape-scala](https://github.com/fwrock/simedape-scala) imports this library as
+`org.htc:tslearn4j:1.1.0-SNAPSHOT` and calls its Java classes in the same JVM.
+`org.tslearn.metrics.ConstrainedDTW` supplies the exact constrained warping paths;
+OpenBLAS/LAPACK supplies native linear algebra through JavaCPP.
+
+The separate `simedape-warping-path` application uses approximate FastDTW. It is
+not required by this library or by the native Scala SimEDaPE pipeline. Python
+SimEDaPE continues to use its Python numerical libraries.
+
 ## Uso Rápido
 
 ### KShape Clustering
